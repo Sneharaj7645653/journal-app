@@ -2,6 +2,7 @@ package net.engineeringdigest.journalApp.controller;
 
 
 import net.engineeringdigest.journalApp.entity.JournalEntry;
+import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.service.JournalEntryService;
 import net.engineeringdigest.journalApp.service.UserService;
 import org.bson.types.ObjectId;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("journal")
+@RequestMapping("user")
 public class UserController {
 
 
@@ -22,5 +23,28 @@ public class UserController {
     private UserService userService;
 
 
+    @GetMapping
+    private List<User> getAllUsers() {
+        return userService.getAll();
+    }
+
+    @PostMapping
+    private User createUser(@RequestBody User newUser) {
+        userService.saveEntry(newUser);
+        return newUser;
+    }
+
+    @PutMapping("/{userName}")
+    private ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable String userName) {
+        User userInDb = userService.findByUserName(userName);
+        if(userInDb!=null) {
+            userInDb.setUserName(user.getUserName());
+            userInDb.setPassword(user.getPassword());
+            userService.saveEntry(userInDb);
+        }
+
+        return new ResponseEntity<>(userInDb, HttpStatus.ACCEPTED);
+
+    }
 
 }
